@@ -19,6 +19,6 @@ public class Roll {
     }
 
     public static int RollD20(){
-        return (int) Math.floor(Math.random() * DieType.D20.die()) + 1;
+        return DieType.D20.die() / 2 + 1;
     }
 }

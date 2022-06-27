@@ -78,9 +78,9 @@ public class Enemy {
         System.out.println(name);
 
         ArrayList<String[]> rows = new ArrayList<>();
-        rows.add(new String[]{"Damage", "Attack", "Character Attribute"});
+        rows.add(new String[]{"Damage Type", "Average Damage", "Character Attribute"});
 
-        int c1 = 8, c2 = 8, c3 = 19;
+        int c1 = 11, c2 = 14, c3 = 19;
 
         for (Attack a : attacks) {
             String s1 = a.damageType + "";

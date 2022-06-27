@@ -1,14 +1,11 @@
 import objects.*;
 import objects.Character;
 import objects.checks.AttackCheck;
-import objects.checks.Check;
 import objects.checks.CheckType;
 import objects.checks.DamageType;
 
 import java.util.ArrayList;
-import java.util.Locale;
 import java.util.Objects;
-import java.util.Scanner;
 
 public class DND {
 
@@ -23,53 +20,33 @@ public class DND {
     }
 
     public static ArrayList<AttackCheck> parseCheck() throws Exception {
-        Scanner sc = new Scanner(System.in);
-        ArrayList<AttackCheck> checks = new ArrayList<AttackCheck>();
+        MyScanner sc = new MyScanner();
+        ArrayList<AttackCheck> checks = new ArrayList<>();
 
         while (true) {
-            System.out.print("Name: (When you want to end adding checks just type end after name: )");
-            String name = sc.next();
+            String name = sc.next("Add weapon: (When you want to end adding checks just type end after name: )", "\"ShortSword\"");
 
             if (name.equals("end")) {
                 return checks;
             }
-
-            System.out.print("Attack damage: ");
-            int value = sc.nextInt();
-
-            System.out.println("Damage type: ");
-            DamageType dmgType = damageType(sc.next());
-
-            System.out.println("Check type: ");
-            String x = sc.nextLine();
-
-            while (x.equals("")) {
-                x = sc.nextLine();
-            }
-
-            CheckType checkType = getCheckType(x);
-
-            System.out.println("Character attribute: ");
-            String characterAttr = getCharacterAttribute(sc.next());
-
-            System.out.println("Rolls: ");
-            String line = sc.nextLine();
-
-            while (line.equals("")) {
-                line = sc.nextLine();
-            }
-
+            String line = sc.nextLine("Rolls: ", "\" 2 d6 \"");
             String[] rollsAr = line.split(", ");
-
 
             ArrayList<Roll> rolls = new ArrayList<>();
             for (String s : rollsAr) rolls.add(getRoll(s));
+
+            DamageType dmgType = damageType(sc.next("Damage type: ", "\" slashing \""));
+
+            String x = sc.nextLine("Check type: ", "\" Simple Melee Weapon \"");
+            CheckType checkType = getCheckType(x);
+
+            String characterAttr = getCharacterAttribute(sc.next("Character attribute: ", "\" dexterity \""));
+
 
             checks.add(
                 new AttackCheck(
                     name,
                     checkType,
-                    value,
                     characterAttr,
                     dmgType,
                     rolls
@@ -78,172 +55,126 @@ public class DND {
         }
     }
 
-    public static Roll getRoll(String roll) {
-        DieType type = null;
-
-        switch (roll.split(" ")[0]) {
-            case "D4":
-                type = DieType.D4;
-                break;
-            case "D6":
-                type = DieType.D6;
-                break;
-            case "D8":
-                type = DieType.D8;
-                break;
-            case "D10":
-                type = DieType.D10;
-                break;
-            case "D12":
-                type = DieType.D12;
-                break;
-            case "D20":
-                type = DieType.D20;
-                break;
-            default:
-                type = DieType.D4;
-        }
+    public static Roll getRoll(String roll) throws Exception {
+        DieType type = switch (roll.split(" ")[1].toUpperCase()) {
+            case "D4" -> DieType.D4;
+            case "D6" -> DieType.D6;
+            case "D8" -> DieType.D8;
+            case "D10" -> DieType.D10;
+            case "D12" -> DieType.D12;
+            case "D20" -> DieType.D20;
+            default -> throw new Exception("Invalid value");
+        };
 
         return new Roll(
-            type,
-            Integer.parseInt(roll.split(" ")[1])
+                type,
+                Integer.parseInt(roll.split(" ")[0])
         );
     }
 
     public static String getCharacterAttribute(String attr) throws Exception {
-        switch (attr) {
-            case "strength":
-                return "strength";
-            case "dexterity":
-                return "dexterity";
-            case "intelligence":
-                return "intelligence";
-            case "wisdom":
-                return "wisdom";
-            case "charisma":
-                return "charisma";
-            default:
-                throw new Exception("Invalid character attribute");
-        }
+        return switch (attr.toUpperCase()) {
+            case "STRENGTH" -> "strength";
+            case "DEXTERITY" -> "dexterity";
+            case "INTELLIGENCE" -> "intelligence";
+            case "WISDOM" -> "wisdom";
+            case "CHARISMA" -> "charisma";
+            default -> throw new Exception("Invalid character attribute");
+        };
     }
 
-    public static CheckType getCheckType(String ch) {
-        switch (ch) {
-            case "Simple Melee Weapon":
-                return CheckType.SimpleMeleeWeapons;
-            case "Simple Ranged Weapon":
-                return CheckType.SimpleRangedWeapons;
-            case "Martial Melee Weapon":
-                return CheckType.MartialMeleeWeapons;
-            case "Martial Ranged Weapon":
-                return CheckType.MartialRangedWeapons;
-            case "Spell":
-                return CheckType.Spell;
-            case "Armor":
-                return CheckType.Armor;
-            default:
-                return CheckType.Spell;
-        }
+    public static CheckType getCheckType(String ch) throws Exception {
+        return switch (ch.toUpperCase()) {
+            case "SIMPLE MELEE WEAPON" -> CheckType.SimpleMeleeWeapons;
+            case "SIMPLE RANGED WEAPON" -> CheckType.SimpleRangedWeapons;
+            case "MARTIAL MELEE WEAPON" -> CheckType.MartialMeleeWeapons;
+            case "MARTIAL RANGED WEAPON" -> CheckType.MartialRangedWeapons;
+            case "SPELL" -> CheckType.Spell;
+            case "ARMOR" -> CheckType.Armor;
+            default -> throw new Exception("Invalid value");
+        };
     }
 
     public static Character load() {
-        Scanner sc = new Scanner(System.in);
+        MyScanner sc = new MyScanner();
 
         String[] names = new String[]{
-            "strenght",
-            "dexterity",
-            "constitution",
-            "intelligence",
-            "wisdom",
-            "charisma",
+                "strenght",
+                "dexterity",
+                "constitution",
+                "intelligence",
+                "wisdom",
+                "charisma",
         };
         int[] stats = new int[6];
         int idx = 0;
 
         while (idx < 6) {
-            System.out.print(names[idx] + ": ");
-            stats[idx] = sc.nextInt();
+            String name = names[idx];
+            stats[idx] = sc.nextInt(name + ": ", " 1 - 20");
             idx++;
         }
 
-        System.out.println("Name: ");
-        String name = sc.next();
-        System.out.println("Class: ");
-        String className = sc.next();
-        CharacterClass characterClass = null;
-
-        switch (className) {
-            case "BARBARIAN":
-                characterClass = CharacterClass.BARBARIAN;
-                break;
-            case "BARD":
-                characterClass = CharacterClass.BARD;
-                break;
-            case "CLERIC":
-                characterClass = CharacterClass.CLERIC;
-                break;
-            case "DRUID":
-                characterClass = CharacterClass.DRUID;
-                break;
-            case "FIGHTER":
-                characterClass = CharacterClass.FIGHTER;
-                break;
-            case "MONK":
-                characterClass = CharacterClass.MONK;
-                break;
-            case "SORCERER":
-                characterClass = CharacterClass.SORCERER;
-                break;
-            case "ROGUE":
-                characterClass = CharacterClass.ROGUE;
-                break;
-        }
+        String name = sc.next("Name: ", "\" Arnold \"");
+        String className = sc.next("Class: ", "\" Barbarian \"");
+        CharacterClass characterClass = switch (className.toUpperCase()) {
+            case "BARBARIAN" -> CharacterClass.BARBARIAN;
+            case "BARD" -> CharacterClass.BARD;
+            case "CLERIC" -> CharacterClass.CLERIC;
+            case "DRUID" -> CharacterClass.DRUID;
+            case "FIGHTER" -> CharacterClass.FIGHTER;
+            case "MONK" -> CharacterClass.MONK;
+            case "SORCERER" -> CharacterClass.SORCERER;
+            case "ROGUE" -> CharacterClass.ROGUE;
+            default -> null;
+        };
 
         return new Character(
-            name,
-            characterClass,
-            stats[0],
-            stats[1],
-            stats[2],
-            stats[3],
-            stats[4],
-            stats[5]
+                name,
+                characterClass,
+                stats[0],
+                stats[1],
+                stats[2],
+                stats[3],
+                stats[4],
+                stats[5]
         );
+    }
+
+    public static DamageType[] parseSet(MyScanner sc, String title, String info) {
+        try {
+            String[] weaknessesAr = sc.nextLine(title, info).split(", ");
+
+            if (Objects.equals(weaknessesAr[0], "none")) {
+                return new DamageType[0];
+            }
+
+            DamageType[] attrSet = new DamageType[weaknessesAr.length];
+            for (int i = 0; i < attrSet.length; i++) attrSet[i] = damageType(weaknessesAr[i]);
+            return attrSet;
+        } catch (Exception ex) {
+            System.out.println("Zadané hodnoty nejsou platné");
+            return parseSet(sc, title, info);
+        }
     }
 
     public static Enemy parseEnemy() {
-        Scanner sc = new Scanner(System.in);
-        System.out.print("Name: ");
-        String name = sc.next();
+        MyScanner sc = new MyScanner();
+        String name = sc.next("Enemy name: ", "\" Goblin \"");
 
-        System.out.println("Weaknesses: (split single damage types by comma and gap)");
-        String[] weaknessesAr = sc.nextLine().split(", ");
-        DamageType[] weaknesses = new DamageType[weaknessesAr.length];
-
-        for (int i = 0; i < weaknesses.length; i++) weaknesses[i] = damageType(weaknessesAr[i]);
-
-        System.out.println("Resistances: (split single damage types by comma and gap)");
-        String[] resistancesAr = sc.nextLine().split(", ");
-        DamageType[] resistances = new DamageType[resistancesAr.length];
-
-        for (int i = 0; i < resistances.length; i++) resistances[i] = damageType(resistancesAr[i]);
-
-        System.out.println("Immunities: (split single damage types by comma and gap)");
-        String[] immunitiesAr = sc.nextLine().split(", ");
-        DamageType[] immunities = new DamageType[immunitiesAr.length];
-
-        for (int i = 0; i < immunities.length; i++) immunities[i] = damageType(immunitiesAr[i]);
-
+        DamageType[] weaknesses = parseSet(sc, "Weaknesses: (split single damage types by comma and gap)", "\" Fire \"");
+        DamageType[] resistances = parseSet(sc, "Resistances: (split single damage types by comma and gap)", "\" Fire \"");
+        DamageType[] immunities = parseSet(sc, "Immunities: (split single damage types by comma and gap)", "\" Fire \"");
         return new Enemy(
-            name,
-            weaknesses,
-            resistances,
-            immunities
+                name,
+                weaknesses,
+                resistances,
+                immunities
         );
     }
 
-    public static DamageType damageType(String d) {
-        switch (d) {
+    public static DamageType damageType(String d) throws Exception {
+        switch (d.toUpperCase()) {
             case "ACID":
                 return DamageType.ACID;
             case "BLUDGEONING":
@@ -271,7 +202,7 @@ public class DND {
             case "THUNDER":
                 return DamageType.THUNDER;
             default:
-                return DamageType.LIGHTNING;
+                throw new Exception("Error");
         }
     }
 }

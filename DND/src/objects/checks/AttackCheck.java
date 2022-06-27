@@ -8,8 +8,8 @@ public class AttackCheck extends Check {
 
     public ArrayList<Roll> rolls;
 
-    public AttackCheck(String name, CheckType type, int value, String characterAttribute, DamageType damageType, ArrayList<Roll> rolls) {
-        super(name, type, value, characterAttribute, damageType);
+    public AttackCheck(String name, CheckType type, String characterAttribute, DamageType damageType, ArrayList<Roll> rolls) {
+        super(name, type, 0, characterAttribute, damageType);
         this.rolls = rolls;
     }
 

@@ -107,26 +107,31 @@ public class Character {
                 Attack attack = new Attack();
 
                 switch (c.characterAttribute) {
-                    case "strength":
+                    case "strength" -> {
                         attack.attack = c.value + getAttackStrength(roll, c.type);
                         attack.type = CharacterAttribute.STRENGTH;
                         attack.damageType = c.damageType;
-                    case "dexterity":
+                    }
+                    case "dexterity" -> {
                         attack.attack = c.value + getAttackDexterity(roll, c.type);
                         attack.type = CharacterAttribute.DEXTERITY;
                         attack.damageType = c.damageType;
-                    case "intelligence":
+                    }
+                    case "intelligence" -> {
                         attack.attack = c.value + getAttackIntelligence(roll, c.type);
                         attack.type = CharacterAttribute.INTELLIGENCE;
                         attack.damageType = c.damageType;
-                    case "wisdom":
+                    }
+                    case "wisdom" -> {
                         attack.attack = c.value + getAttackWisdom(roll, c.type);
                         attack.type = CharacterAttribute.WISDOM;
                         attack.damageType = c.damageType;
-                    case "charisma":
+                    }
+                    case "charisma" -> {
                         attack.attack = c.value + getAttackCharisma(roll, c.type);
                         attack.type = CharacterAttribute.CHARISMA;
                         attack.damageType = c.damageType;
+                    }
                 }
 
                 return attack;
